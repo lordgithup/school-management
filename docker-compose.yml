@@ -2,24 +2,34 @@ version: "3"
 services:
   application:
     image: spring-boot-mysql-app
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     networks:
       - springboot-db-net
     depends_on:
       - mysqldb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/school_db?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
     volumes:
-      - /data/springboot-app
+      - /data/springboot-app:/app
+
   mysqldb:
     image: mysql:8.0
     networks:
       - springboot-db-net
     ports:
-     - "3306:3306"
+      - "3306:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=school_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: school_db
     volumes:
-      - /data/mysql
+      - /data/mysql:/var/lib/mysql
+
 networks:
   springboot-db-net:
+    driver: bridge
